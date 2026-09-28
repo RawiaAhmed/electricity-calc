@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://fawateer-masr.pages.dev/sitemap.xml
