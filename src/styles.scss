@@ -1,0 +1,54 @@
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --surface: #f5f8fc;
+  --surface-strong: #e6eef8;
+  --text: #1a202c;
+  --text-muted: #4a5568;
+  --border: #d5dde8;
+  --border-strong: #8a9bb3;
+  --accent: #1f5fa8;
+  --accent-strong: #163f73;
+  --focus: #f0a500;
+  --warning: #c77700;
+  --warning-bg: #fff4e0;
+  --error: #b42318;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #11161f;
+    --surface: #18202c;
+    --surface-strong: #222d3d;
+    --text: #e8edf4;
+    --text-muted: #a9b5c6;
+    --border: #2f3b4d;
+    --border-strong: #5c6d86;
+    --accent: #7fb3f0;
+    --accent-strong: #a9cdf7;
+    --warning-bg: #3a2a10;
+    --error: #ff8a80;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, 'Segoe UI', Tahoma, 'Geeza Pro', sans-serif;
+  line-height: 1.7;
+}
+
+// Every clickable element shows the pointer; disabled ones say so.
+a,
+button,
+[role='button'],
+label[for],
+select {
+  cursor: pointer;
+}
+
+[disabled],
+[aria-disabled='true'] {
+  cursor: not-allowed;
+}
