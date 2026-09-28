@@ -13,14 +13,11 @@ npm test           # 22 tests
 npm run build      # static site in dist/egypt-electricity-calculator/browser
 ```
 
-## Deploy (Cloudflare Pages)
+## Deploy (Cloudflare Workers, static assets)
 
-```bash
-npx wrangler login   # once, opens the browser
-npm run deploy       # tests, builds, then uploads to egypt-electricity-calculator.pages.dev
-```
+Connected to GitHub: every push to `main` builds with `npm run build` and deploys with `npx wrangler deploy`. `wrangler.jsonc` points at the build folder, and `.node-version` makes Cloudflare use Node 24.
 
-`npm run deploy` stops before uploading if any test fails, so a broken price table never goes live.
+Manual deploy from this machine: `npx wrangler login` once, then `npm run deploy` (runs the tests first and stops if any fail).
 
 ## When prices change
 

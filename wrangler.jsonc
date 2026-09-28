@@ -1,0 +1,8 @@
+// Cloudflare Workers config: serves the prerendered Angular build as static files.
+{
+  "name": "electricity-calc",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist/egypt-electricity-calculator/browser"
+  }
+}
