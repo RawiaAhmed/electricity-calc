@@ -1,0 +1,4 @@
+# Angular also outputs index.csr.html, a copy of the page with no prerendered content.
+# Send anyone (and any crawler) who reaches it to the real homepage.
+/index.csr.html  /  301
+/index.csr       /  301
