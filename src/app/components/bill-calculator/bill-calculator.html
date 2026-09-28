@@ -1,0 +1,165 @@
+<main class="page">
+  <header class="intro">
+    <h1>حاسبة فاتورة الكهرباء</h1>
+    <p>
+      احسب فاتورة الكهرباء المنزلية بالأسعار الجديدة ({{ effectiveFrom }})، واعرف لو استهلاكك قريب
+      من شريحة أغلى.
+    </p>
+  </header>
+
+  <section class="calculator" aria-labelledby="calculator-title">
+    <h2 id="calculator-title" class="visually-hidden">الحاسبة</h2>
+
+    <label for="kwh" class="field-label">استهلاكك الشهري بالكيلووات ساعة</label>
+    <input
+      id="kwh"
+      class="field"
+      type="text"
+      inputmode="numeric"
+      autocomplete="off"
+      placeholder="مثال: 250"
+      aria-describedby="kwh-hint"
+      [attr.aria-invalid]="inputError() || null"
+      [value]="kwhInput()"
+      (input)="onKwhInput($event)"
+    />
+    <p id="kwh-hint" class="hint">
+      @if (inputError()) {
+        <span class="error">اكتب رقمًا صحيحًا فقط، بدون كسور أو حروف.</span>
+      } @else {
+        تلاقيه في الفاتورة جنب كلمة "الاستهلاك"، أو اطرح القراءة السابقة من القراءة الحالية للعداد.
+      }
+    </p>
+
+    <!-- Polite so the total is read out once the user pauses typing, not on every key. -->
+    <div class="result" aria-live="polite">
+      @if (bill(); as bill) {
+        <p class="total">
+          فاتورتك المتوقعة:
+          <strong>{{ money(bill.totalPiasters) }} جنيه</strong>
+        </p>
+
+        @if (bill.lines.length > 0) {
+          <table class="breakdown">
+            <caption>
+              تفاصيل الحساب
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">الكيلووات</th>
+                <th scope="col">السعر</th>
+                <th scope="col">القيمة</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (line of bill.lines; track line.fromKwh) {
+                <tr>
+                  <td>
+                    {{ number(line.kwh) }} (من {{ number(line.fromKwh) }} إلى
+                    {{ number(line.toKwh) }})
+                  </td>
+                  <td>{{ number(line.pricePiasters) }} قرش</td>
+                  <td>{{ money(line.costPiasters) }} جنيه</td>
+                </tr>
+              }
+              <tr>
+                <td colspan="2">مقابل خدمة العملاء</td>
+                <td>{{ money(bill.serviceFeePiasters) }} جنيه</td>
+              </tr>
+            </tbody>
+          </table>
+        } @else {
+          <p>العداد مقروء بصفر، فتدفع مقابل خدمة العملاء فقط.</p>
+        }
+
+        @if (priceJump(); as jump) {
+          <div class="warning" role="note">
+            <strong>انتبه:</strong>
+            لو زاد استهلاكك {{ number(jump.kwhUntilJump) }} كيلووات بس ووصل
+            {{ number(jump.jumpAtKwh) }}، فاتورتك هتقفز إلى
+            <strong>{{ money(jump.billAtJump.totalPiasters) }} جنيه</strong>، لأنك هتخسر سعر الشرائح
+            الأرخص.
+          </div>
+        }
+      }
+    </div>
+  </section>
+
+  <section aria-labelledby="tiers-title">
+    <h2 id="tiers-title">أسعار شرائح الكهرباء المنزلية ({{ effectiveFrom }})</h2>
+    <table class="tiers">
+      <thead>
+        <tr>
+          <th scope="col">الاستهلاك الشهري (كيلووات)</th>
+          <th scope="col">سعر الكيلووات</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (tier of tierTable; track tier.from) {
+          <tr>
+            <td>
+              @if (tier.to === null) {
+                أكثر من {{ number(tier.from) }}
+              } @else {
+                من {{ number(tier.from) }} إلى {{ number(tier.to) }}
+              }
+            </td>
+            <td>{{ number(tier.price) }} قرش</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <section aria-labelledby="how-title">
+    <h2 id="how-title">إزاي بتتحسب الفاتورة؟</h2>
+    <p>الشرائح مش بتتجمع على بعض ببساطة. الاستهلاك الكلي للشهر هو اللي بيحدد طريقة الحساب:</p>
+    <ul>
+      <li>
+        <strong>لحد 100 كيلووات:</strong> أول 50 بسعر الشريحة الأولى، والباقي بسعر الشريحة التانية.
+      </li>
+      <li>
+        <strong>من 101 لحد 650 كيلووات:</strong> بتخسر الشريحتين الأولى والتانية. أول 200 كيلووات
+        بسعر الشريحة التالتة، ومن 201 لـ 350 بسعر الرابعة، ومن 351 لـ 650 بسعر الخامسة.
+      </li>
+      <li><strong>من 651 لحد 1000 كيلووات:</strong> كل الاستهلاك بسعر الشريحة السادسة.</li>
+      <li><strong>أكثر من 1000 كيلووات:</strong> كل الاستهلاك بسعر الشريحة السابعة.</li>
+    </ul>
+    <p>وبيتضاف على الفاتورة مقابل خدمة العملاء، وقيمته من 1 لـ 40 جنيه حسب الاستهلاك.</p>
+  </section>
+
+  <section aria-labelledby="faq-title">
+    <h2 id="faq-title">أسئلة شائعة</h2>
+
+    <h3>ليه الفاتورة بتزيد كتير لما أعدي 100 أو 650 كيلووات؟</h3>
+    <p>
+      لأنك بتنتقل لمجموعة حساب جديدة وبتخسر الأسعار الأرخص على كل الاستهلاك، مش على الكيلووات
+      الزيادة بس. مثلًا 100 كيلووات فاتورتها {{ money(billAt100) }} جنيه، لكن 101 كيلووات فاتورتها
+      {{ money(billAt101) }} جنيه.
+    </p>
+
+    <h3>هل الحاسبة دي بتنفع للعداد الكودي؟</h3>
+    <p>
+      لأ. العداد الكودي ليه طريقة محاسبة مختلفة. الحاسبة دي للعدادات المنزلية العادية وعدادات
+      الكارت.
+    </p>
+
+    <h3>هل الرقم ده هو اللي هدفعه بالظبط؟</h3>
+    <p>
+      هو تقدير مبني على التعريفة الرسمية. الفاتورة الفعلية ممكن تختلف شوية بسبب أي رسوم أو تسويات
+      تانية بتظهر على الفاتورة.
+    </p>
+  </section>
+
+  <footer class="sources">
+    <h2>المصادر</h2>
+    <ul>
+      @for (source of sources; track source.url) {
+        <li>
+          <a [href]="source.url" rel="noopener" target="_blank">{{ source.label }}</a>
+        </li>
+      }
+    </ul>
+    <p>الموقع ده مستقل ومش تابع لوزارة الكهرباء أو أي جهة حكومية.</p>
+  </footer>
+</main>

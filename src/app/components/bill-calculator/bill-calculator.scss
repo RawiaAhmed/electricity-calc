@@ -1,0 +1,142 @@
+.page {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.intro h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.9rem;
+  color: var(--accent-strong);
+}
+
+.intro p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+h2 {
+  margin: 2.5rem 0 0.75rem;
+  font-size: 1.35rem;
+}
+
+h3 {
+  margin: 1.5rem 0 0.25rem;
+  font-size: 1.05rem;
+}
+
+.calculator {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.field-label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.field {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  font-size: 1.3rem;
+  border: 2px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+
+  &:focus {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+    border-color: var(--accent);
+  }
+
+  &[aria-invalid='true'] {
+    border-color: var(--error);
+  }
+}
+
+.hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.error {
+  color: var(--error);
+  font-weight: 700;
+}
+
+.result:not(:empty) {
+  margin-top: 1.25rem;
+}
+
+.total {
+  margin: 0 0 1rem;
+  font-size: 1.15rem;
+
+  strong {
+    display: block;
+    font-size: 2rem;
+    color: var(--accent-strong);
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+caption {
+  text-align: start;
+  font-weight: 700;
+  padding-bottom: 0.5rem;
+}
+
+th,
+td {
+  text-align: start;
+  padding: 0.55rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  background: var(--surface-strong);
+}
+
+.warning {
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border-inline-start: 4px solid var(--warning);
+  border-radius: 6px;
+  background: var(--warning-bg);
+}
+
+.sources {
+  margin-top: 3rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+
+  h2 {
+    font-size: 1.05rem;
+  }
+
+  a {
+    color: var(--accent);
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
