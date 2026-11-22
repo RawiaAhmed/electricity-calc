@@ -1,17 +1,13 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { BillService } from '../../service/bill.service';
+import { SeoService } from '../../service/seo.service';
+import { formatMoney, formatNumber, parseReading } from '../../utils/format';
 import { TARIFF_EFFECTIVE_FROM, TARIFF_SOURCES, TIER_PRICES } from '../../utils/tariff';
-
-// Readings above this are almost certainly a typo, and would print absurd bills.
-const MAX_KWH = 100_000;
-
-const moneyFormat = new Intl.NumberFormat('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const numberFormat = new Intl.NumberFormat('ar-EG');
 
 @Component({
   selector: 'app-bill-calculator',
   templateUrl: './bill-calculator.html',
-  styleUrl: './bill-calculator.scss',
+  styleUrl: '../calculator-page.scss',
 })
 export class BillCalculator {
   private readonly billService = inject(BillService);
@@ -36,7 +32,7 @@ export class BillCalculator {
 
   protected readonly kwhInput = signal('');
 
-  protected readonly kwh = computed(() => parseKwh(this.kwhInput()));
+  protected readonly kwh = computed(() => parseReading(this.kwhInput()));
   protected readonly inputError = computed(() => this.kwhInput().trim() !== '' && this.kwh() === null);
   protected readonly bill = computed(() => {
     const kwh = this.kwh();
@@ -47,24 +43,21 @@ export class BillCalculator {
     return kwh === null ? null : this.billService.findNextPriceJump(kwh);
   });
 
+  protected readonly money = formatMoney;
+  protected readonly number = formatNumber;
+
+  constructor() {
+    inject(SeoService).setPage({
+      title: 'حاسبة فاتورة الكهرباء 2026 | احسب فاتورتك بأسعار الشرائح الجديدة',
+      description:
+        'احسب فاتورة الكهرباء المنزلية في مصر بأسعار شرائح أغسطس 2026، مع تفاصيل الحساب لكل شريحة وتنبيه لو استهلاكك قريب من شريحة أغلى.',
+      path: '/',
+      image: '/og-image.png',
+      imageAlt: 'حاسبة فاتورة الكهرباء: احسب فاتورتك بأسعار شرائح أغسطس 2026',
+    });
+  }
+
   protected onKwhInput(event: Event): void {
     this.kwhInput.set((event.target as HTMLInputElement).value);
   }
-
-  protected money(piasters: number): string {
-    return moneyFormat.format(piasters / 100);
-  }
-
-  protected number(value: number): string {
-    return numberFormat.format(value);
-  }
-}
-
-/** Accepts whole kWh, typed in Western or Arabic-Indic digits. */
-function parseKwh(text: string): number | null {
-  const westernDigits = text.trim().replace(/[٠-٩]/g, (digit) => String(digit.charCodeAt(0) - 0x0660));
-  if (!/^\d+$/.test(westernDigits)) return null;
-
-  const kwh = Number(westernDigits);
-  return kwh <= MAX_KWH ? kwh : null;
 }

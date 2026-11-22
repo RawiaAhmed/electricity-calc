@@ -140,3 +140,9 @@ th {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+.note {
+  margin: 1rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}

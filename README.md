@@ -39,3 +39,13 @@ Not covered: coded meters (العداد الكودي), which have their own flat
 
 - AdSense: apply once the site is live with its own domain. Ad slots are not in the page yet.
 - Domain and hosting.
+
+## Gas calculator (/gas)
+
+Prices in `src/app/utils/gas-tariff.ts` (6 / 8 / 12 EGP per m³ from 10 March 2026, Mobtada reporting the Ministry of Petroleum). Unlike electricity, the whole month is charged at the price of its tier (not stacked). That method comes from published examples and is **not yet confirmed against a real bill**, so the page shows a note asking users to check against their bill. Confirm with one real bill, then remove the note.
+
+## Adding a page
+
+1. Tariff in `src/app/utils/`, calculation in `src/app/service/` (with tests), page in `src/app/components/`.
+2. Add the route in `src/app/app.routes.ts` and a link in `src/app/app.html`.
+3. Call `SeoService.setPage()` in the component, make a 1200x630 sharing image in `public/`, and add the URL to `public/sitemap.xml`.

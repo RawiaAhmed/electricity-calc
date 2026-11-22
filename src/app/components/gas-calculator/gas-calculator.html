@@ -1,0 +1,151 @@
+<main class="page">
+  <header class="intro">
+    <h1>حاسبة فاتورة الغاز الطبيعي</h1>
+    <p>
+      احسب فاتورة الغاز الطبيعي للمنازل بالأسعار الجديدة (من {{ effectiveFrom }})، واعرف لو
+      استهلاكك قريب من شريحة أغلى.
+    </p>
+  </header>
+
+  <section class="calculator" aria-labelledby="calculator-title">
+    <h2 id="calculator-title" class="visually-hidden">الحاسبة</h2>
+
+    <label for="m3" class="field-label">استهلاكك الشهري بالمتر المكعب</label>
+    <input
+      id="m3"
+      class="field"
+      type="text"
+      inputmode="numeric"
+      autocomplete="off"
+      placeholder="مثال: 25"
+      aria-describedby="m3-hint"
+      [attr.aria-invalid]="inputError() || null"
+      [value]="m3Input()"
+      (input)="onM3Input($event)"
+    />
+    <p id="m3-hint" class="hint">
+      @if (inputError()) {
+        <span class="error">اكتب رقمًا صحيحًا فقط، بدون كسور أو حروف.</span>
+      } @else {
+        تلاقيه في الفاتورة جنب كلمة "الاستهلاك"، أو اطرح القراءة السابقة من القراءة الحالية للعداد.
+      }
+    </p>
+
+    <!-- Polite so the total is read out once the user pauses typing, not on every key. -->
+    <div class="result" aria-live="polite">
+      @if (bill(); as bill) {
+        <p class="total">
+          فاتورتك المتوقعة:
+          <strong>{{ money(bill.totalPiasters) }} جنيه</strong>
+        </p>
+
+        @if (bill.m3 > 0) {
+          <table class="breakdown">
+            <caption>
+              تفاصيل الحساب
+            </caption>
+            <tbody>
+              <tr>
+                <th scope="row">الشريحة</th>
+                <td>{{ number(bill.tierNumber) }}</td>
+              </tr>
+              <tr>
+                <th scope="row">سعر المتر</th>
+                <td>{{ money(bill.pricePiasters) }} جنيه</td>
+              </tr>
+              <tr>
+                <th scope="row">الحساب</th>
+                <td>
+                  {{ number(bill.m3) }} متر × {{ money(bill.pricePiasters) }} =
+                  {{ money(bill.totalPiasters) }} جنيه
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        }
+
+        @if (priceJump(); as jump) {
+          <div class="warning" role="note">
+            <strong>انتبه:</strong>
+            لو زاد استهلاكك {{ number(jump.m3UntilJump) }} متر بس ووصل {{ number(jump.jumpAtM3) }}،
+            فاتورتك هتقفز إلى <strong>{{ money(jump.billAtJump.totalPiasters) }} جنيه</strong>، لأن كل
+            الاستهلاك هيتحسب بسعر الشريحة الأغلى.
+          </div>
+        }
+      }
+    </div>
+
+    <p class="note">
+      الحساب مبني على الأسعار المعلنة وطريقة الحساب المنشورة. راجعه مع فاتورتك، وممكن تظهر عليها رسوم
+      تانية.
+    </p>
+  </section>
+
+  <section aria-labelledby="tiers-title">
+    <h2 id="tiers-title">أسعار شرائح الغاز الطبيعي للمنازل (من {{ effectiveFrom }})</h2>
+    <table class="tiers">
+      <thead>
+        <tr>
+          <th scope="col">الاستهلاك الشهري (متر مكعب)</th>
+          <th scope="col">سعر المتر</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (tier of tierTable; track tier.from) {
+          <tr>
+            <td>
+              @if (tier.to === null) {
+                أكثر من {{ number(tier.from) }}
+              } @else {
+                من {{ number(tier.from) }} إلى {{ number(tier.to) }}
+              }
+            </td>
+            <td>{{ money(tier.price) }} جنيه</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <section aria-labelledby="how-title">
+    <h2 id="how-title">إزاي بتتحسب فاتورة الغاز؟</h2>
+    <p>
+      على عكس الكهرباء، شرائح الغاز مش بتتجمع. استهلاك الشهر كله بيتحسب بسعر الشريحة اللي وقع فيها.
+      يعني لو استهلكت 40 متر، الـ 40 كلهم بيتحسبوا بسعر الشريحة التانية.
+    </p>
+  </section>
+
+  <section aria-labelledby="faq-title">
+    <h2 id="faq-title">أسئلة شائعة</h2>
+
+    <h3>ليه الفاتورة بتزيد كتير لما أعدي 30 أو 60 متر؟</h3>
+    <p>
+      لأن كل الاستهلاك بينتقل لسعر الشريحة الأعلى، مش المتر الزيادة بس. مثلًا 30 متر فاتورتها
+      {{ money(billAt30) }} جنيه، لكن 31 متر فاتورتها {{ money(billAt31) }} جنيه.
+    </p>
+
+    <h3>إيه هي الفاتورة التقديرية؟</h3>
+    <p>
+      لو محصل الغاز ماقدرش يقرا العداد، زي لما الشقة تكون مقفولة، الشركة بتحسب استهلاك تقديري مؤقت.
+      ولما العداد يتقرا فعلًا، بتتم تسوية الفرق على الفاتورة. عشان تتجنبها، سجّل قراءة العداد بنفسك
+      عن طريق شركة الغاز بتاعتك.
+    </p>
+
+    <h3>هل الرقم ده هو اللي هدفعه بالظبط؟</h3>
+    <p>
+      هو تقدير مبني على الأسعار المعلنة. الفاتورة الفعلية ممكن تختلف شوية بسبب أي رسوم أو تسويات تانية.
+    </p>
+  </section>
+
+  <footer class="sources">
+    <h2>المصادر</h2>
+    <ul>
+      @for (source of sources; track source.url) {
+        <li>
+          <a [href]="source.url" rel="noopener" target="_blank">{{ source.label }}</a>
+        </li>
+      }
+    </ul>
+    <p>الموقع ده مستقل ومش تابع لوزارة البترول أو أي شركة غاز أو جهة حكومية.</p>
+  </footer>
+</main>

@@ -1,0 +1,19 @@
+<nav class="site-nav" aria-label="الحاسبات">
+  <a class="brand" routerLink="/">فواتير مصر</a>
+  <ul>
+    <li>
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+        >الكهرباء</a
+      >
+    </li>
+    <li>
+      <a routerLink="/gas" routerLinkActive="active" ariaCurrentWhenActive="page">الغاز</a>
+    </li>
+  </ul>
+</nav>
+
+<router-outlet />
